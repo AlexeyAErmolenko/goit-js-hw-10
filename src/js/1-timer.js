@@ -4,8 +4,7 @@ import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 
 let userSelectedDate = Date.now();
-let deltaTime = {};
-let idInterval = null;
+let deltaTime = { days: '00', hours: '00', minutes: '00', seconds: '00' };
 
 const refs = {
   input: document.querySelector('#datetime-picker'),
@@ -27,7 +26,10 @@ const options = {
 flatpickr(refs.input, options);
 
 function isFutureDate(userSelectedDate) {
-  if (userSelectedDate - Date.now() < 0 && idInterval === null) {
+  if (
+    userSelectedDate - Date.now() < 0 &&
+    !refs.input.hasAttribute('disabled')
+  ) {
     iziToast.error({
       title: 'Error',
       position: 'topRight',
@@ -43,55 +45,6 @@ function isFutureDate(userSelectedDate) {
   }
 }
 
-refs.button.addEventListener('click', () => {
-  if (isFutureDate(userSelectedDate)) {
-    refs.button.setAttribute('disabled', ' ');
-    countdown.start();
-  }
-});
-
-const countdown = {
-  start() {
-    idInterval = setInterval(() => {
-      deltaTime = convertMs(userSelectedDate - Date.now());
-      if (deltaTime.days < 0) {
-        return this.stop();
-      }
-      updateTimerFace(deltaTime);
-    }, 1000);
-  },
-  stop() {
-    clearInterval(idInterval);
-    idInterval = null;
-    refs.input.removeAttribute('disabled', ' ');
-  },
-};
-
-function convertMs(ms) {
-  // Number of milliseconds per unit of time
-  const second = 1000;
-  const minute = second * 60;
-  const hour = minute * 60;
-  const day = hour * 24;
-
-  // Remaining days
-  const days = addLeadingZero(Math.floor(ms / day));
-  // Remaining hours
-  const hours = addLeadingZero(Math.floor((ms % day) / hour));
-  // Remaining minutes
-  const minutes = addLeadingZero(Math.floor(((ms % day) % hour) / minute));
-  // Remaining seconds
-  const seconds = addLeadingZero(
-    Math.floor((((ms % day) % hour) % minute) / second)
-  );
-
-  return { days, hours, minutes, seconds };
-}
-
-function addLeadingZero(value) {
-  return String(value).padStart(2, '0');
-}
-
 function updateTimerFace({ days, hours, minutes, seconds }) {
   document.querySelector('[data-days]').textContent = deltaTime.days;
   document.querySelector('[data-hours]').textContent = deltaTime.hours;
@@ -99,58 +52,61 @@ function updateTimerFace({ days, hours, minutes, seconds }) {
   document.querySelector('[data-seconds]').textContent = deltaTime.seconds;
 }
 
-// class Countdown {
-//   constructor(onTick) {
-//     let idInterval = null;
-//     this.onTick = onTick;
-//   }
+class Countdown {
+  constructor({ onTick }) {
+    idInterval: null, (this.onTick = onTick);
+    this.init();
+  }
 
-//   init() {
-//     const deltaTime = this.convertMs(userSelectedDate - Date.now());
-//     this.onTick(deltaTime);
-//   }
+  init() {
+    this.onTick(deltaTime);
+  }
 
-//   start() {
-//     this.idInterval = setInterval(() => {
-//       this.deltaTime = this.convertMs(userSelectedDate - Date.now());
-//       if (deltaTime.days < 0) {
-//         return this.stop();
-//       }
-//       updateTimerFace(this.deltaTime);
-//     }, 1000);
-//   }
-//   stop() {
-//     clearInterval(this.idInterval);
-//     idInterval = null;
-//     refs.input.removeAttribute('disabled', ' ');
-//   }
+  start() {
+    if (isFutureDate(userSelectedDate)) {
+      refs.button.setAttribute('disabled', ' ');
+      this.idInterval = setInterval(() => {
+        deltaTime = this.convertMs(userSelectedDate - Date.now());
+        if (deltaTime.days < 0) {
+          return this.stop();
+        }
+        this.onTick(deltaTime);
+      }, 1000);
+    }
+  }
+  stop() {
+    clearInterval(this.idInterval);
+    this.idInterval = null;
+    refs.input.removeAttribute('disabled', ' ');
+  }
 
-//   // Helpers
-//   convertMs(ms) {
-//     // Number of milliseconds per unit of time
-//     const second = 1000;
-//     const minute = second * 60;
-//     const hour = minute * 60;
-//     const day = hour * 24;
+  // Helpers
+  convertMs(ms) {
+    // Number of milliseconds per unit of time
+    const second = 1000;
+    const minute = second * 60;
+    const hour = minute * 60;
+    const day = hour * 24;
 
-//     // Remaining days
-//     const days = this.addLeadingZero(Math.floor(ms / day));
-//     // Remaining hours
-//     const hours = this.addLeadingZero(Math.floor((ms % day) / hour));
-//     // Remaining minutes
-//     const minutes = this.addLeadingZero(
-//       Math.floor(((ms % day) % hour) / minute)
-//     );
-//     // Remaining seconds
-//     const seconds = this.addLeadingZero(
-//       Math.floor((((ms % day) % hour) % minute) / second)
-//     );
+    // Remaining days
+    const days = this.addLeadingZero(Math.floor(ms / day));
+    // Remaining hours
+    const hours = this.addLeadingZero(Math.floor((ms % day) / hour));
+    // Remaining minutes
+    const minutes = this.addLeadingZero(
+      Math.floor(((ms % day) % hour) / minute)
+    );
+    // Remaining seconds
+    const seconds = this.addLeadingZero(
+      Math.floor((((ms % day) % hour) % minute) / second)
+    );
 
-//     return { days, hours, minutes, seconds };
-//   }
-//   addLeadingZero(value) {
-//     return String(value).padStart(2, '0');
-//   }
-// }
+    return { days, hours, minutes, seconds };
+  }
+  addLeadingZero(value) {
+    return String(value).padStart(2, '0');
+  }
+}
 
-// const timerInstance = new Countdown({ onTick: updateTimerFace });
+const timerInstance = new Countdown({ onTick: updateTimerFace });
+refs.button.addEventListener('click', timerInstance.start.bind(timerInstance));
