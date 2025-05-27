@@ -20,6 +20,7 @@
 /* My style */
 main {
   padding: 20px 0;
+  margin: 36px 156px;
 }
 
 .nav {
@@ -66,10 +67,9 @@ main {
 
 .timer-box {
   margin-top: 108px;
-  margin-left: 156px;
 }
 
-input {
+.timer-box input {
   width: 238px;
   /* height: 40px; */
   background: #fff;
@@ -84,22 +84,22 @@ input {
   margin-bottom: 32px;
 }
 
-input:hover {
+.timer-box input:hover {
   border-color: #000;
 }
 
-input:active {
+.timer-box input:active {
   color: #000;
   border-color: #4e75ff;
 }
 
-input:disabled {
+.timer-box input:disabled {
   color: #808080;
   border-color: #808080;
   background: #fafafa;
 }
 
-button {
+.timer-box button {
   margin-left: 8px;
   border-radius: 8px;
   padding: 7px 17px;
@@ -113,28 +113,28 @@ button {
   background: #4e75ff;
 }
 
-button:hover {
+.timer-box button:hover {
   color: #fff;
   background: #6c8cff;
 }
 
-button:disabled {
+.timer-box button:disabled {
   color: #989898;
   background: #cfcfcf;
 }
 
 
-.timer {
+.timer-box .timer {
   max-width: 346px;
   display: flex;
   gap: 24px;
 }
 
-.field {
+.timer-box .field {
   text-align: center;
 }
 
-.value {
+.timer-box .value {
   font-weight: 400;
   font-size: 40px;
   line-height: 120%;
@@ -142,11 +142,87 @@ button:disabled {
   color: #2e2f42;
 }
 
-.label {
+.timer-box .label {
   font-weight: 400;
   font-size: 16px;
   line-height: 150%;
   color: #2e2f42;
   text-align: center;
   text-transform: uppercase;
+}
+
+
+/* snackbar */
+.snackbar-box {}
+
+.form {
+  width: 360px;
+}
+
+.form>label,
+.form legend {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  letter-spacing: 0.04em;
+  color: #2e2f42;
+}
+
+.snackbar-box [name=delay] {
+  border: 1px solid #808080;
+  border-radius: 4px;
+  width: 326px;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  letter-spacing: 0.04em;
+  color: #2e2f42;
+  padding: 8px 16px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.snackbar-box button {
+  border-radius: 8px;
+  padding: 8px 16px;
+  width: 360px;
+  /* height: 40px; */
+  background: #4e75ff;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 150%;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+
+fieldset {
+  border-radius: 4px;
+  stroke-width: 1px;
+  stroke: #808080;
+  padding: 24px 46px 8px 46px;
+  margin-bottom: 24px;
+}
+
+fieldset>label {
+  display: inline-block;
+  width: 112px;
+  height: 32px;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  color: #2e2f42;
+  /* margin-left: 40px; */
+}
+
+legend+label {
+  width: 104px;
+  margin-right: 44px;
+}
+
+fieldset [type="radio"] {
+  border: 1px solid #757575;
+  border-radius: 14px;
+  width: 20px;
+  height: 20px;
+  margin-right: 11px;
 }
