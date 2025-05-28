@@ -20,29 +20,29 @@ const options = {
   onClose(selectedDates) {
     if (isFutureDate(selectedDates[0])) {
       userSelectedDate = selectedDates[0];
+      refs.button.removeAttribute('disabled');
+    } else {
+      refs.button.setAttribute('disabled', ' ');
+      iziToast.error({
+        title: 'Error',
+        position: 'topRight',
+        message: 'Please choose a date in the future',
+      });
     }
   },
 };
 flatpickr(refs.input, options);
 
 function isFutureDate(userSelectedDate) {
-  if (
-    userSelectedDate - Date.now() < 0 &&
-    !refs.input.hasAttribute('disabled')
-  ) {
-    iziToast.error({
-      title: 'Error',
-      position: 'topRight',
-      message: 'Please choose a date in the future',
-    });
-    refs.button.setAttribute('disabled', ' ');
-    refs.input.removeAttribute('disabled', ' ');
-    return false;
-  } else {
-    refs.button.removeAttribute('disabled');
-    refs.input.setAttribute('disabled', ' ');
-    return true;
-  }
+  return userSelectedDate - Date.now() < 0 ? false : true;
+}
+
+function isTimerZero(deltaTime) {
+  return Number(
+    Object.values(deltaTime).reduce((sum, value) => sum + value, 0)
+  ) > 0
+    ? false
+    : true;
 }
 
 function updateTimerFace({ days, hours, minutes, seconds }) {
@@ -65,12 +65,13 @@ class Countdown {
   start() {
     if (isFutureDate(userSelectedDate)) {
       refs.button.setAttribute('disabled', ' ');
+      refs.input.setAttribute('disabled', ' ');
       this.idInterval = setInterval(() => {
         deltaTime = this.convertMs(userSelectedDate - Date.now());
-        if (deltaTime.days < 0) {
+        this.onTick(deltaTime);
+        if (isTimerZero(deltaTime)) {
           return this.stop();
         }
-        this.onTick(deltaTime);
       }, 1000);
     }
   }

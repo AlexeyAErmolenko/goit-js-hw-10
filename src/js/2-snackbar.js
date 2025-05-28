@@ -14,47 +14,45 @@ state.forEach(state => {
   state.addEventListener('change', () => {
     if (state.checked) {
       formData.stateValue = state.value;
-      // console.log('🚀 ~ state.addEventListener:', formData);
     }
   });
 });
 
 function onInput(event) {
   formData.delayValue = event.target.value;
-  // console.log('🚀 ~ delay.addEventListener:', formData);
 }
 delay.addEventListener('input', onInput);
 
 function onFormSubmit(event) {
   event.preventDefault();
-  // console.log('🚀 ~ onButtonSubmit:', formData);
   const promise = new Promise((resolve, reject) => {
     setTimeout(() => {
       if (formData.stateValue === 'fulfilled') {
-        resolve(
-          iziToast.success({
-            title: 'OK',
-            message: `✅ Fulfilled promise in ${formData.delayValue}ms`,
-            position: 'topRight',
-          })
-        );
+        resolve(`promise in ${formData.delayValue}ms`);
       } else {
-        reject(
-          iziToast.error({
-            title: 'Error',
-            message: `❌ Rejected promise in ${formData.delayValue}ms`,
-            position: 'topRight',
-          })
-        );
+        reject(`promise in ${formData.delayValue}ms`);
       }
     }, formData.delayValue);
   });
 
-  promise.finally(() => {
-    // formData = { delayValue: 0, stateValue: '' };
-    // console.log('🚀 ~ promise.finally ~ formData:', formData);
-    reset();
-  });
+  promise
+    .then(value =>
+      iziToast.success({
+        title: 'OK',
+        message: `✅ Fulfilled ` + value,
+        position: 'topRight',
+      })
+    )
+    .catch(error =>
+      iziToast.error({
+        title: 'Error',
+        message: `❌ Rejected ` + error,
+        position: 'topRight',
+      })
+    )
+    .finally(() => {
+      reset();
+    });
 }
 form.addEventListener('submit', onFormSubmit);
 
