@@ -38,23 +38,25 @@ function isFutureDate(userSelectedDate) {
 }
 
 function isTimerZero(deltaTime) {
-  return Number(
-    Object.values(deltaTime).reduce((sum, value) => sum + value, 0)
-  ) > 0
-    ? false
-    : true;
+  for (const value of Object.values(deltaTime)) {
+    if (Number(value) !== 0) {
+      return false;
+    }
+  }
+  return true;
 }
 
 function updateTimerFace({ days, hours, minutes, seconds }) {
-  document.querySelector('[data-days]').textContent = deltaTime.days;
-  document.querySelector('[data-hours]').textContent = deltaTime.hours;
-  document.querySelector('[data-minutes]').textContent = deltaTime.minutes;
-  document.querySelector('[data-seconds]').textContent = deltaTime.seconds;
+  document.querySelector('[data-days]').textContent = days;
+  document.querySelector('[data-hours]').textContent = hours;
+  document.querySelector('[data-minutes]').textContent = minutes;
+  document.querySelector('[data-seconds]').textContent = seconds;
 }
 
 class Countdown {
   constructor({ onTick }) {
-    idInterval: null, (this.onTick = onTick);
+    idInterval: null;
+    this.onTick = onTick;
     this.init();
   }
 
@@ -62,9 +64,11 @@ class Countdown {
     this.onTick(deltaTime);
   }
 
+  // Метод start() не враховує ситуацію, коли різниця у часі стає негативною після початкової перевірки обраного часу. Умовна перевірка повинна також відбуватися в циклі зворотного виклику інтервалу.
+  // Не згоден! Другий рядок в методі не дає змогу запустить таймер, коли час стає негативним після початкової перевірки обраного часу. Для чого додаткова умовна перевірка в циклі зворотного виклику інтервалу, якщо така ситуація може виникнути один раз при старті?
   start() {
+    refs.button.setAttribute('disabled', ' ');
     if (isFutureDate(userSelectedDate)) {
-      refs.button.setAttribute('disabled', ' ');
       refs.input.setAttribute('disabled', ' ');
       this.idInterval = setInterval(() => {
         deltaTime = this.convertMs(userSelectedDate - Date.now());
